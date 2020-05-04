@@ -9,14 +9,15 @@
 import SwiftUI
 
 struct ContactView: View {
-    let dates = [22, 23, 24, 25, 26]
-    let times = ["10:00", "3:00", "5:00"]
-    let ATs = ["Shannon", "Kyle", "Wade"]
+    let dates = [5, 6, 7, 8, 9, 10]
+    let times = ["7:00", "10:00", "13:00", "16:00", "19:00"]
+    
     @EnvironmentObject var root: RootViewModel
+    @ObservedObject var networkDaemon = NetworkDaemon()
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("April").font(.title).bold()
+            Text("May").font(.title).bold()
             ForEach(dates, id: \.self) { date in
                 HStack {
                     Text(String(date))
@@ -32,16 +33,21 @@ struct ContactView: View {
                 }
             }
             Text("Chat").font(.title).bold().padding(.top, 50)
-            ForEach(ATs, id: \.self) { at in
+            ForEach(networkDaemon.trainers, id: \.self) { trainer in
                 Button(action: {}) {
-                    Image(systemName: "person.fill")
-                    Text(at)
+                    HStack {
+                        Image(systemName: "person.fill")
+                        VStack(alignment: .leading) {
+                            Text(trainer.firstName + " " + trainer.lastName).font(.callout)
+                            Text(trainer.title).font(.caption)
+                        }
+                    }
                 }
             }
             Spacer().onAppear {
-            self.root.tabNavigationHidden = false
-            self.root.tabNavigationTitle = "Schedule Appointment"
-            self.root.tabNavigationBarTrailingItems = .init(Image(systemName: "plus.circle"))
+                self.root.tabNavigationHidden = false
+                self.root.tabNavigationTitle = "Schedule Appointment"
+                self.root.tabNavigationBarTrailingItems = .init(Image(systemName: "plus.circle"))
             }
         }.padding()
     }
