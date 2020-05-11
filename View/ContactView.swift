@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import MessageUI
 
 struct ContactView: View {
     let dates = [5, 6, 7, 8, 9, 10]
@@ -14,8 +15,12 @@ struct ContactView: View {
     
     @EnvironmentObject var root: RootViewModel
     @ObservedObject var networkDaemon = NetworkDaemon()
+    @State var result: Result<MFMailComposeResult, Error>? = nil
+    @State var isShowingMailView = false
+    @State var selectedRecipient = ""
     
     var body: some View {
+        ZStack {
         VStack(alignment: .leading) {
             Text("May").font(.title).bold()
             ForEach(dates, id: \.self) { date in
@@ -34,7 +39,10 @@ struct ContactView: View {
             }
             Text("Chat").font(.title).bold().padding(.top, 50)
             ForEach(networkDaemon.trainers, id: \.self) { trainer in
-                Button(action: {}) {
+                Button(action: {
+                    self.isShowingMailView.toggle()
+                    self.selectedRecipient = trainer.email
+                }) {
                     HStack {
                         Image(systemName: "person.fill")
                         VStack(alignment: .leading) {
@@ -50,5 +58,16 @@ struct ContactView: View {
                 self.root.tabNavigationBarTrailingItems = .init(Image(systemName: "plus.circle"))
             }
         }.padding()
+            if (isShowingMailView) {
+                mailView()
+                .transition(.move(edge: .bottom))
+                .animation(.default)
+            }
+        }
+    }
+    private func mailView() -> some View {
+        MFMailComposeViewController.canSendMail() ?
+            AnyView(MailView(recipient: selectedRecipient, isShowing: $isShowingMailView, result: $result)) :
+            AnyView(Text("Can't send emails from this device"))
     }
 }

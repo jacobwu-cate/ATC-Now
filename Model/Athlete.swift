@@ -13,11 +13,13 @@ struct Athlete: Codable, Hashable {
     public var firstName: String
     public var lastName: String
     public var sport: String
+    public var assigned: String
     enum CodingKeys: String, CodingKey {
         case id = "Id"
         case firstName = "FirstName"
         case lastName = "LastName"
         case sport = "Sport"
+        case assigned = "Assigned"
     }
 }
 
